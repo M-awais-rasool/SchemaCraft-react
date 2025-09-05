@@ -1,52 +1,36 @@
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 
-// Pages
-import LandingPage from './pages/auth/LandingPage'
-import LoginScreen from './pages/auth/Login'
-import AdminDashboard from './pages/admin/AdminDashboard'
-import UserDashboard from './pages/user/UserDashboard'
-
-// Context
-import { AuthProvider } from './contexts/AuthContext'
-import { ProtectedRoute } from './components/ProtectedRoute'
-import { PublicRoute } from './components/PublicRoute'
+// Test if we can import components one by one
+function TestComponent() {
+  return (
+    <div className="min-h-screen bg-green-500 flex items-center justify-center">
+      <div className="text-white text-4xl font-bold">
+        ✅ Components Loading Successfully!
+      </div>
+    </div>
+  )
+}
 
 function App() {
-  return (
-    <AuthProvider>
+  try {
+    return (
       <Router>
         <div className="min-h-screen bg-white">
           <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route 
-              path="/login" 
-              element={
-                <PublicRoute>
-                  <LoginScreen />
-                </PublicRoute>
-              } 
-            />
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute requireAdmin={true}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/user" 
-              element={
-                <ProtectedRoute>
-                  <UserDashboard />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="/" element={<TestComponent />} />
           </Routes>
         </div>
       </Router>
-    </AuthProvider>
-  )
+    )
+  } catch (error) {
+    return (
+      <div className="min-h-screen bg-red-500 flex items-center justify-center">
+        <div className="text-white text-2xl">
+          ❌ Error: {error instanceof Error ? error.message : 'Unknown error'}
+        </div>
+      </div>
+    )
+  }
 }
 
 export default App
