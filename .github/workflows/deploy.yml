@@ -35,8 +35,11 @@ jobs:
 
     - name: Deploy to S3
       run: |
-        aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
-        aws s3 cp dist/index.html s3://${{ secrets.S3_BUCKET_NAME }}/index.html --cache-control no-cache
+        aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }} --delete --exact-timestamps
+        aws s3 cp dist/index.html s3://${{ secrets.S3_BUCKET_NAME }}/index.html --cache-control no-cache --content-type "text/html"
+        aws s3 cp dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ --recursive --exclude "index.html" --exclude "*.js" --exclude "*.css"
+        aws s3 cp dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ --recursive --exclude "*" --include "*.js" --content-type "application/javascript"
+        aws s3 cp dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ --recursive --exclude "*" --include "*.css" --content-type "text/css"
         
     - name: Invalidate CloudFront Distribution (Optional)
       run: |
