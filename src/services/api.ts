@@ -6,7 +6,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
+ 
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token');
