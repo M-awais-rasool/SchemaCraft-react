@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Create axios instance
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://43.205.233.33:8080/',
   headers: {
@@ -8,7 +7,6 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add token to requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token');
@@ -22,14 +20,12 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle errors
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       window.location.href = '/login';
