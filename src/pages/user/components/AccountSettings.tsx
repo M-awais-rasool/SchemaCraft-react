@@ -6,17 +6,17 @@ import {
   Notifications,
   Language,
   Delete,
-  Save,
-  Visibility,
-  VisibilityOff,
+  // Save,
+  // Visibility,
+  // VisibilityOff,
   Warning
 } from '@mui/icons-material'
 import { useAuth } from '../../../contexts/AuthContext'
  
 const AccountSettings = () => {
-  const { user, updateUser } = useAuth()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
-  const [showPassword, setShowPassword] = useState(false)
+  // const [showPassword, setShowPassword] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -27,18 +27,18 @@ const AccountSettings = () => {
     email: '',
   })
   
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  })
+  // const [passwordData, setPasswordData] = useState({
+  //   currentPassword: '',
+  //   newPassword: '',
+  //   confirmPassword: ''
+  // })
   
-  const [notifications, setNotifications] = useState({
-    emailUpdates: true,
-    apiAlerts: true,
-    securityNotifications: true,
-    marketing: false
-  })
+  // const [notifications, setNotifications] = useState({
+  //   emailUpdates: true,
+  //   apiAlerts: true,
+  //   securityNotifications: true,
+  //   marketing: false
+  // })
 
   // Load user data on component mount
   useEffect(() => {
@@ -60,10 +60,10 @@ const AccountSettings = () => {
     setTimeout(clearMessages, 5000)
   }
 
-  const showSuccess = (message: string) => {
-    setSuccessMessage(message)
-    setTimeout(clearMessages, 3000)
-  }
+  // const showSuccess = (message: string) => {
+  //   setSuccessMessage(message)
+  //   setTimeout(clearMessages, 3000)
+  // }
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: Person },
@@ -72,74 +72,74 @@ const AccountSettings = () => {
     { id: 'preferences', label: 'Preferences', icon: Language }
   ]
 
-  const handleProfileSave = async () => {
-    clearMessages()
-    setLoading(true)
+  // const handleProfileSave = async () => {
+  //   clearMessages()
+  //   setLoading(true)
     
-    try {
-      // Note: Backend endpoints don't exist yet, so we'll show a message
-      // await UserService.updateProfile(profileData)
+  //   try {
+  //     // Note: Backend endpoints don't exist yet, so we'll show a message
+  //     // await UserService.updateProfile(profileData)
       
-      // For now, just show success message since backend endpoint doesn't exist
-      showSuccess('Profile updated successfully! (Note: Backend endpoint not implemented yet)')
+  //     // For now, just show success message since backend endpoint doesn't exist
+  //     showSuccess('Profile updated successfully! (Note: Backend endpoint not implemented yet)')
       
-      // Update user in context if needed
-      if (updateUser) {
-        await updateUser()
-      }
-    } catch (error: any) {
-      showError(error.response?.data?.error || 'Failed to update profile')
-    } finally {
-      setLoading(false)
-    }
-  }
+  //     // Update user in context if needed
+  //     if (updateUser) {
+  //       await updateUser()
+  //     }
+  //   } catch (error: any) {
+  //     showError(error.response?.data?.error || 'Failed to update profile')
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
-  const handlePasswordChange = async () => {
-    clearMessages()
+  // const handlePasswordChange = async () => {
+  //   clearMessages()
     
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      showError('New passwords do not match!')
-      return
-    }
+  //   if (passwordData.newPassword !== passwordData.confirmPassword) {
+  //     showError('New passwords do not match!')
+  //     return
+  //   }
     
-    if (passwordData.newPassword.length < 6) {
-      showError('New password must be at least 6 characters long')
-      return
-    }
+  //   if (passwordData.newPassword.length < 6) {
+  //     showError('New password must be at least 6 characters long')
+  //     return
+  //   }
     
-    setLoading(true)
+  //   setLoading(true)
     
-    try {
-      // Note: Backend endpoint doesn't exist yet
-      // await UserService.changePassword({
-      //   currentPassword: passwordData.currentPassword,
-      //   newPassword: passwordData.newPassword
-      // })
+  //   try {
+  //     // Note: Backend endpoint doesn't exist yet
+  //     // await UserService.changePassword({
+  //     //   currentPassword: passwordData.currentPassword,
+  //     //   newPassword: passwordData.newPassword
+  //     // })
       
-      showSuccess('Password updated successfully! (Note: Backend endpoint not implemented yet)')
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
-    } catch (error: any) {
-      showError(error.response?.data?.error || 'Failed to update password')
-    } finally {
-      setLoading(false)
-    }
-  }
+  //     showSuccess('Password updated successfully! (Note: Backend endpoint not implemented yet)')
+  //     setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+  //   } catch (error: any) {
+  //     showError(error.response?.data?.error || 'Failed to update password')
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
-  const handleNotificationsSave = async () => {
-    clearMessages()
-    setLoading(true)
+  // const handleNotificationsSave = async () => {
+  //   clearMessages()
+  //   setLoading(true)
     
-    try {
-      // Note: Backend endpoint doesn't exist yet
-      // await UserService.updateNotificationPreferences(notifications)
+  //   try {
+  //     // Note: Backend endpoint doesn't exist yet
+  //     // await UserService.updateNotificationPreferences(notifications)
       
-      showSuccess('Notification preferences updated! (Note: Backend endpoint not implemented yet)')
-    } catch (error: any) {
-      showError(error.response?.data?.error || 'Failed to update notification preferences')
-    } finally {
-      setLoading(false)
-    }
-  }
+  //     showSuccess('Notification preferences updated! (Note: Backend endpoint not implemented yet)')
+  //   } catch (error: any) {
+  //     showError(error.response?.data?.error || 'Failed to update notification preferences')
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   const handleDeleteAccount = async () => {
     clearMessages()
