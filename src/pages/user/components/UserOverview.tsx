@@ -11,14 +11,18 @@ import {
   Timeline
 } from '@mui/icons-material'
 import { UserService, type DashboardData } from '../../../services/userService'
+import ActivityService, { type Activity } from '../../../services/activityService'
 
 const UserOverview = ({setActiveTab}:any) => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [recentActivities, setRecentActivities] = useState<Activity[]>([])
+  const [activitiesLoading, setActivitiesLoading] = useState(false)
 
   useEffect(() => {
     fetchDashboardData()
+    fetchRecentActivities()
   }, [])
 
   const fetchDashboardData = async () => {
@@ -31,6 +35,18 @@ const UserOverview = ({setActiveTab}:any) => {
       setError(err.response?.data?.error || 'Failed to load dashboard data')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchRecentActivities = async () => {
+    try {
+      setActivitiesLoading(true)
+      const response = await ActivityService.getActivities(1, 5) // Get last 5 activities
+      setRecentActivities(response.activities)
+    } catch (err: any) {
+      console.error('Failed to fetch recent activities:', err)
+    } finally {
+      setActivitiesLoading(false)
     }
   }
 
@@ -115,14 +131,6 @@ const UserOverview = ({setActiveTab}:any) => {
       icon: Add,
       action: 'tables'
     }
-  ]
-
-  const recentActivity = [
-    { action: 'Created table "users"', time: '2 hours ago', type: 'create' },
-    { action: 'API call to /products', time: '5 hours ago', type: 'api' },
-    { action: 'Updated "orders" schema', time: '1 day ago', type: 'update' },
-    { action: 'Connected MongoDB database', time: '2 days ago', type: 'connect' },
-    { action: 'Generated new API key', time: '3 days ago', type: 'security' }
   ]
 
   return (
@@ -229,15 +237,32 @@ const UserOverview = ({setActiveTab}:any) => {
             <Timeline className="w-5 h-5 text-gray-400" />
           </div>
           <div className="space-y-3">
-            {recentActivity.map((activity, index) => (
-              <div key={index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50">
-                <div className="w-2 h-2 rounded-full bg-black" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                  <p className="text-xs text-gray-500">{activity.time}</p>
+            {activitiesLoading ? (
+              // Loading skeleton for activities
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="flex items-center space-x-3 p-3 rounded-lg animate-pulse">
+                  <div className="w-2 h-2 rounded-full bg-gray-300" />
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-300 rounded w-3/4 mb-1"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </div>
                 </div>
+              ))
+            ) : recentActivities.length > 0 ? (
+              recentActivities.map((activity, index) => (
+                <div key={activity.id || index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50">
+                  <div className={`w-2 h-2 rounded-full ${ActivityService.getActivityColor(activity.type).replace('text-', 'bg-')}`} />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                    <p className="text-xs text-gray-500">{ActivityService.formatTimeAgo(activity.created_at)}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-3 text-center text-gray-500 text-sm">
+                No recent activity
               </div>
-            ))}
+            )}
           </div>
         </motion.div>
 

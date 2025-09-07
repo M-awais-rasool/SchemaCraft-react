@@ -48,65 +48,54 @@ export interface APIUsageStats {
 }
 
 class AdminService {
-  // Get platform statistics
   async getStats(): Promise<AdminStats> {
     const response = await api.get('/admin/stats');
     return response.data;
   }
 
-  // Get all users with pagination
   async getAllUsers(page: number = 1, limit: number = 20): Promise<PaginatedUsers> {
     const response = await api.get(`/admin/users?page=${page}&limit=${limit}`);
     return response.data;
   }
 
-  // Get user by ID
   async getUserById(userId: string): Promise<User> {
     const response = await api.get(`/admin/users/${userId}`);
     return response.data;
   }
 
-  // Toggle user status (activate/deactivate)
   async toggleUserStatus(userId: string, isActive: boolean): Promise<void> {
     await api.put(`/admin/users/${userId}/toggle-status`, { is_active: isActive });
   }
 
-  // Revoke user's API key
   async revokeUserAPIKey(userId: string): Promise<void> {
     await api.post(`/admin/users/${userId}/revoke-api-key`);
   }
 
-  // Get all schemas (admin can see all users' schemas)
   async getAllSchemas(): Promise<any[]> {
     const response = await api.get('/admin/schemas');
     return response.data;
   }
 
-  // Get user's specific schemas
   async getUserSchemas(userId: string): Promise<any[]> {
     const response = await api.get(`/admin/users/${userId}/schemas`);
     return response.data;
   }
 
-  // Get API usage statistics
   async getAPIUsageStats(threshold: number = 80): Promise<APIUsageStats> {
     const response = await api.get(`/admin/api-usage?threshold=${threshold}`);
     return response.data;
   }
 
-  // Reset user's API quota
   async resetUserQuota(userId: string): Promise<{ message: string }> {
     const response = await api.post(`/admin/users/${userId}/reset-quota`);
     return response.data;
   }
 
-  // Helper function to format usage percentage
   formatUsagePercentage(used: number, limit: number): string {
     const percentage = (used / limit) * 100;
     return `${percentage.toFixed(1)}%`;
   }
 
-  // Helper function to get usage status color
   getUsageStatusColor(used: number, limit: number): string {
     const percentage = (used / limit) * 100;
     if (percentage >= 100) return 'text-red-600';
@@ -116,7 +105,6 @@ class AdminService {
     return 'text-green-600';
   }
 
-  // Helper function to get usage status badge color
   getUsageStatusBadgeColor(used: number, limit: number): string {
     const percentage = (used / limit) * 100;
     if (percentage >= 100) return 'bg-red-100 text-red-800';

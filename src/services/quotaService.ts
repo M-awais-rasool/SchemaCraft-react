@@ -42,19 +42,16 @@ export interface APIUsageStats {
 }
 
 class QuotaService {
-  // Get API usage statistics (Admin only)
   static async getAPIUsageStats(threshold = 80): Promise<APIUsageStats> {
     const response = await api.get(`/admin/api-usage?threshold=${threshold}`)
     return response.data
   }
 
-  // Reset a user's API quota (Admin only)
   static async resetUserQuota(userId: string): Promise<{ message: string }> {
     const response = await api.post(`/admin/users/${userId}/reset-quota`)
     return response.data
   }
 
-  // Check if an error is a quota exceeded error
   static isQuotaExceededError(error: any): error is { response: { data: QuotaExceededError; status: 429 } } {
     return (
       error?.response?.status === 429 &&
@@ -62,13 +59,11 @@ class QuotaService {
     )
   }
 
-  // Format quota usage percentage
   static formatUsagePercentage(used: number, limit: number): string {
     const percentage = (used / limit) * 100
     return `${percentage.toFixed(1)}%`
   }
 
-  // Get quota status color based on usage percentage
   static getQuotaStatusColor(used: number, limit: number): string {
     const percentage = (used / limit) * 100
     if (percentage >= 100) return 'text-red-600'
@@ -77,7 +72,6 @@ class QuotaService {
     return 'text-green-600'
   }
 
-  // Get quota status message
   static getQuotaStatusMessage(used: number, limit: number): string {
     const percentage = (used / limit) * 100
     const remaining = limit - used

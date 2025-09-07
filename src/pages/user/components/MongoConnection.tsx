@@ -294,8 +294,7 @@ const MongoConnection = () => {
             <div>
               <h3 className="font-medium text-gray-900">Create a MongoDB Account</h3>
               <p className="text-sm text-gray-600">
-                Sign up for a free MongoDB Atlas account at{' '}
-                <a href="#" className="text-black hover:underline">mongodb.com/atlas</a>
+                Sign up for a free MongoDB Atlas account at mongodb.com/atlas
               </p>
             </div>
           </div>

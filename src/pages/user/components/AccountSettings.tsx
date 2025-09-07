@@ -25,9 +25,6 @@ const AccountSettings = () => {
   const [profileData, setProfileData] = useState({
     name: '',
     email: '',
-    company: '',
-    timezone: 'UTC-5',
-    language: 'English'
   })
   
   const [passwordData, setPasswordData] = useState({
@@ -49,9 +46,6 @@ const AccountSettings = () => {
       setProfileData({
         name: user.name || '',
         email: user.email || '',
-        company: '', // Backend doesn't store this yet
-        timezone: 'UTC-5', // Backend doesn't store this yet
-        language: 'English' // Backend doesn't store this yet
       })
     }
   }, [user])
@@ -180,6 +174,7 @@ const AccountSettings = () => {
             <input
               type="text"
               value={profileData.name}
+              disabled
               onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
             />
@@ -191,42 +186,15 @@ const AccountSettings = () => {
             </label>
             <input
               type="email"
+              disabled
               value={profileData.email}
               onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Company
-            </label>
-            <input
-              type="text"
-              value={profileData.company}
-              onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Timezone
-            </label>
-            <select
-              value={profileData.timezone}
-              onChange={(e) => setProfileData({ ...profileData, timezone: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            >
-              <option value="UTC-5">UTC-5 (Eastern)</option>
-              <option value="UTC-6">UTC-6 (Central)</option>
-              <option value="UTC-7">UTC-7 (Mountain)</option>
-              <option value="UTC-8">UTC-8 (Pacific)</option>
-            </select>
-          </div>
         </div>
         
-        <div className="mt-6 flex justify-end">
+        {/* <div className="mt-6 flex justify-end">
           <button
             onClick={handleProfileSave}
             disabled={loading}
@@ -235,7 +203,7 @@ const AccountSettings = () => {
             <Save className="w-4 h-4" />
             <span>{loading ? 'Saving...' : 'Save Changes'}</span>
           </button>
-        </div>
+        </div> */}
       </div>
     </motion.div>
   )
@@ -246,7 +214,7 @@ const AccountSettings = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <div>
+      {/* <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h3>
         <div className="space-y-4">
           <div>
@@ -320,6 +288,9 @@ const AccountSettings = () => {
             </button>
           </div>
         </div>
+      </div> */}
+      <div className="flex items-center justify-center h-32">
+        <span className="text-gray-500 text-lg font-medium">This feature is coming soon.</span>
       </div>
     </motion.div>
   )
@@ -330,7 +301,7 @@ const AccountSettings = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <div>
+      {/* <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h3>
         <div className="space-y-4">
           {Object.entries(notifications).map(([key, value]) => (
@@ -369,6 +340,9 @@ const AccountSettings = () => {
             <span>{loading ? 'Saving...' : 'Save Preferences'}</span>
           </button>
         </div>
+      </div> */}
+       <div className="flex items-center justify-center h-32">
+        <span className="text-gray-500 text-lg font-medium">This feature is coming soon.</span>
       </div>
     </motion.div>
   )
@@ -379,38 +353,6 @@ const AccountSettings = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Language & Region</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Language
-            </label>
-            <select
-              value={profileData.language}
-              onChange={(e) => setProfileData({ ...profileData, language: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            >
-              <option value="English">English</option>
-              <option value="Spanish">Spanish</option>
-              <option value="French">French</option>
-              <option value="German">German</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Date Format
-            </label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent">
-              <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-              <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-              <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
       <div className="border-t border-gray-200 pt-6">
         <h3 className="text-lg font-semibold text-red-600 mb-4 flex items-center">
           <Warning className="w-5 h-5 mr-2" />

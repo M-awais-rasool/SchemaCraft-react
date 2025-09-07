@@ -56,25 +56,21 @@ export interface CreateSchemaRequest {
 }
 
 export class SchemaService {
-  // Create a new schema
   static async createSchema(data: CreateSchemaRequest): Promise<Schema> {
     const response = await api.post<Schema>('/schemas', data);
     return response.data;
   }
 
-  // Get all schemas for the user
   static async getSchemas(): Promise<Schema[]> {
     const response = await api.get<Schema[]>('/schemas');
     return response.data;
   }
 
-  // Get a specific schema by ID
   static async getSchemaById(id: string): Promise<Schema> {
     const response = await api.get<Schema>(`/schemas/${id}`);
     return response.data;
   }
 
-  // Delete a schema
   static async deleteSchema(id: string): Promise<{ message: string }> {
     const response = await api.delete<{ message: string }>(`/schemas/${id}`);
     return response.data;

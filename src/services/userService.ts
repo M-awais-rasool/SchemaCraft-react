@@ -22,6 +22,12 @@ export interface DashboardData {
     has_custom_db: boolean;
   };
   schemas: any[];
+  recent_activities?: {
+    id: string;
+    type: string;
+    action: string;
+    created_at: string;
+  }[];
 }
 
 export interface APIUsageData {
@@ -34,25 +40,21 @@ export interface APIUsageData {
 }
 
 export class UserService {
-  // Get user dashboard data
   static async getDashboard(): Promise<DashboardData> {
     const response = await api.get<DashboardData>('/user/dashboard');
     return response.data;
   }
 
-  // Regenerate API key
   static async regenerateAPIKey(): Promise<{ message: string; api_key: string }> {
     const response = await api.post<{ message: string; api_key: string }>('/user/regenerate-api-key');
     return response.data;
   }
 
-  // Get API usage statistics
   static async getAPIUsage(): Promise<APIUsageData> {
     const response = await api.get<APIUsageData>('/user/api-usage');
     return response.data;
   }
 
-  // Update user profile
   static async updateProfile(profileData: {
     name: string;
     email: string;
@@ -60,41 +62,33 @@ export class UserService {
     timezone?: string;
     language?: string;
   }): Promise<void> {
-    // Note: Backend doesn't have this endpoint yet, so we'll prepare for when it's available
     const response = await api.put('/auth/profile', profileData);
     return response.data;
   }
 
-  // Change password
   static async changePassword(passwordData: {
     currentPassword: string;
     newPassword: string;
   }): Promise<void> {
-    // Note: Backend doesn't have this endpoint yet, so we'll prepare for when it's available
     const response = await api.put('/auth/change-password', passwordData);
     return response.data;
   }
 
-  // Update notification preferences
   static async updateNotificationPreferences(preferences: {
     emailUpdates: boolean;
     apiAlerts: boolean;
     securityNotifications: boolean;
     marketing: boolean;
   }): Promise<void> {
-    // Note: Backend doesn't have this endpoint yet, so we'll prepare for when it's available
     const response = await api.put('/auth/notification-preferences', preferences);
     return response.data;
   }
 
-  // Delete account
   static async deleteAccount(): Promise<void> {
-    // Note: Backend doesn't have this endpoint yet, so we'll prepare for when it's available
     const response = await api.delete('/auth/account');
     return response.data;
   }
 
-  // Get API documentation
   static async getAPIDocumentation(): Promise<any> {
     const response = await api.get('/user/api-documentation');
     return response.data;

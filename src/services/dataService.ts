@@ -34,7 +34,6 @@ export class DataService {
       throw new Error('API key not found');
     }
 
-    // Create a separate axios instance for API key requests
     const apiInstance = api.create({
       baseURL: import.meta.env.VITE_API_BASE_URL || 'https://www.schemacraft.it.com/',
       headers: {
@@ -46,14 +45,12 @@ export class DataService {
     return apiInstance;
   }
 
-  // Create a document in a collection
   static async createDocument(collection: string, data: Record<string, any>): Promise<DataRecord> {
     const apiInstance = this.getAPIInstance();
     const response = await apiInstance.post<DataRecord>(`/api/${collection}`, data);
     return response.data;
   }
 
-  // Get documents from a collection
   static async getDocuments(
     collection: string,
     page: number = 1,
@@ -66,14 +63,12 @@ export class DataService {
     return response.data;
   }
 
-  // Get a specific document by ID
   static async getDocumentById(collection: string, id: string): Promise<DataRecord> {
     const apiInstance = this.getAPIInstance();
     const response = await apiInstance.get<DataRecord>(`/api/${collection}/${id}`);
     return response.data;
   }
 
-  // Update a document
   static async updateDocument(
     collection: string,
     id: string,
@@ -84,7 +79,6 @@ export class DataService {
     return response.data;
   }
 
-  // Delete a document
   static async deleteDocument(collection: string, id: string): Promise<{ message: string }> {
     const apiInstance = this.getAPIInstance();
     const response = await apiInstance.delete<{ message: string }>(`/api/${collection}/${id}`);

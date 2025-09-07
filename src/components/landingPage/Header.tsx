@@ -104,16 +104,12 @@ export function Header() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Button
-                asChild
-                variant="ghost"
-                size="sm"
-                className="hidden sm:inline-flex"
-              >
-                <Link to="/login">
-                  Login
+                <Link
+                to="/login"
+                className="hidden sm:inline-flex hover:bg-gray-100 transition-colors rounded px-3 py-1"
+                >
+                Login
                 </Link>
-              </Button>
             </motion.div>
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -210,9 +206,6 @@ export function Header() {
                 >
                   <Button variant="ghost" size="sm">
                     Login
-                  </Button>
-                  <Button size="sm">
-                    Sign Up
                   </Button>
                 </motion.div>
               </motion.nav>
