@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://jrddq52klg.execute-api.ap-south-1.amazonaws.com/',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://www.schemacraft.it.com/',
   headers: {
     'Content-Type': 'application/json',
   },

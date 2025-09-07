@@ -36,7 +36,7 @@ export class DataService {
 
     // Create a separate axios instance for API key requests
     const apiInstance = api.create({
-      baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+      baseURL: import.meta.env.VITE_API_BASE_URL || 'https://www.schemacraft.it.com/',
       headers: {
         'Content-Type': 'application/json',
         'X-API-Key': apiKey,
