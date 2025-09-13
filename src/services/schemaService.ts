@@ -75,4 +75,9 @@ export class SchemaService {
     const response = await api.delete<{ message: string }>(`/schemas/${id}`);
     return response.data;
   }
+
+  static async updateSchema(id: string, data: CreateSchemaRequest): Promise<Schema> {
+    const response = await api.put<Schema>(`/schemas/${id}`, data);
+    return response.data;
+  }
 }

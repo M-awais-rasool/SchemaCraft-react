@@ -13,6 +13,8 @@ import {
 } from '@mui/icons-material'
 import { SchemaService, type Schema, type SchemaField, type AuthConfig } from '../../../services/schemaService'
 import { useAuth } from '../../../contexts/AuthContext'
+import NotificationPopup from '../../../components/NotificationPopup'
+import ConfirmationPopup from '../../../components/ConfirmationPopup'
 
 const AuthManager = () => {
   const { user } = useAuth()
@@ -21,7 +23,19 @@ const AuthManager = () => {
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
- 
+
+  // Notification popup state
+  const [showNotification, setShowNotification] = useState(false)
+  const [notificationConfig, setNotificationConfig] = useState({
+    type: 'success' as 'success' | 'error',
+    title: '',
+    message: ''
+  })
+
+  // Confirmation popup state
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+
   // Form state
   const [tableName, setTableName] = useState('')
   const [userFields, setUserFields] = useState<SchemaField[]>([
@@ -48,6 +62,12 @@ const AuthManager = () => {
 
   const fieldTypes = ['string', 'number', 'boolean', 'array', 'object', 'date']
   const hasMongoConnection = user?.mongodb_uri && user?.database_name
+
+  // Helper function to show notifications
+  const showNotificationPopup = (type: 'success' | 'error', title: string, message: string) => {
+    setNotificationConfig({ type, title, message })
+    setShowNotification(true)
+  }
 
   useEffect(() => {
     fetchAuthSchemas()
@@ -81,28 +101,28 @@ const AuthManager = () => {
     if (field.name !== undefined) {
       const oldField = userFields[index]
       const newConfig = { ...authConfig }
-      
+
       // Update email field reference
       if (newConfig.login_fields.email_field === oldField.name) {
         newConfig.login_fields.email_field = field.name
       }
-      
+
       // Update password field reference
       if (newConfig.password_field === oldField.name) {
         newConfig.password_field = field.name
       }
-      
+
       // Update username field reference
       if (newConfig.login_fields.username_field === oldField.name) {
         newConfig.login_fields.username_field = field.name
       }
-      
+
       // Update response fields
       const responseIndex = newConfig.response_fields.indexOf(oldField.name)
       if (responseIndex !== -1 && field.name) {
         newConfig.response_fields[responseIndex] = field.name
       }
-      
+
       setAuthConfig(newConfig)
     }
   }
@@ -111,7 +131,7 @@ const AuthManager = () => {
     if (userFields.length > 1) {
       const fieldToRemove = userFields[index]
       setUserFields(userFields.filter((_, i) => i !== index))
-      
+
       // Remove from auth config references
       const newConfig = { ...authConfig }
       if (newConfig.login_fields.email_field === fieldToRemove.name) {
@@ -163,21 +183,21 @@ const AuthManager = () => {
     try {
       setCreating(true)
       setError(null)
-      
+
       const finalAuthConfig = {
         ...authConfig,
         user_collection: authConfig.user_collection || `${tableName}_users`
       }
-      
+
       await SchemaService.createSchema({
         collection_name: tableName,
         fields: userFields,
         auth_config: finalAuthConfig
       })
-      
+
       // Refresh auth schemas list
       await fetchAuthSchemas()
-      
+
       // Reset form
       setShowCreateModal(false)
       setTableName('')
@@ -202,8 +222,8 @@ const AuthManager = () => {
         require_email_verification: false,
         allow_signup: true
       })
-      
-      alert(`Authentication system "${tableName}" created successfully!`)
+
+      showNotificationPopup('success', 'Authentication System Created!', `Authentication system "${tableName}" has been created successfully with secure endpoints.`)
     } catch (err: any) {
       console.error('Failed to create auth system:', err)
       setError(err.response?.data?.error || 'Failed to create authentication system')
@@ -212,19 +232,30 @@ const AuthManager = () => {
     }
   }
 
-  const handleDeleteAuthSchema = async (schemaId: string) => {
-    if (!confirm('Are you sure you want to delete this authentication system? This action cannot be undone.')) {
-      return
-    }
+  const handleDeleteAuthSchema = (schemaId: string) => {
+    setPendingDeleteId(schemaId)
+    setShowConfirmation(true)
+  }
+
+  const confirmDeleteAuthSchema = async () => {
+    if (!pendingDeleteId) return
 
     try {
-      await SchemaService.deleteSchema(schemaId)
+      await SchemaService.deleteSchema(pendingDeleteId)
       await fetchAuthSchemas()
-      alert('Authentication system deleted successfully!')
+      showNotificationPopup('success', 'Authentication System Deleted!', 'The authentication system and all its associated data have been permanently removed.')
     } catch (err: any) {
       console.error('Failed to delete auth schema:', err)
-      alert(err.response?.data?.error || 'Failed to delete authentication system')
+      showNotificationPopup('error', 'Deletion Failed', err.response?.data?.error || 'Failed to delete authentication system. Please try again.')
+    } finally {
+      setShowConfirmation(false)
+      setPendingDeleteId(null)
     }
+  }
+
+  const cancelDeleteAuthSchema = () => {
+    setShowConfirmation(false)
+    setPendingDeleteId(null)
   }
 
   const stringFields = userFields.filter(field => field.type === 'string')
@@ -266,11 +297,10 @@ const AuthManager = () => {
         <button
           onClick={() => hasMongoConnection ? setShowCreateModal(true) : setError('Please first add a MongoDB connection')}
           disabled={!hasMongoConnection}
-          className={`mt-6 sm:mt-0 flex items-center space-x-3 px-6 py-3 rounded-xl transition-all ${
-            hasMongoConnection 
-              ? 'bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl' 
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
+          className={`mt-6 sm:mt-0 flex items-center space-x-3 px-6 py-3 rounded-xl transition-all ${hasMongoConnection
+            ? 'bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl'
+            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
         >
           <Security className="w-5 h-5" />
           <span className="font-semibold">Create Auth System</span>
@@ -403,7 +433,7 @@ const AuthManager = () => {
                   <Edit className="w-5 h-5" />
                 </button>
               </div>
-              <button 
+              <button
                 onClick={() => handleDeleteAuthSchema(schema.id)}
                 className="p-2 text-gray-400 hover:text-black transition-colors rounded-lg hover:bg-gray-100"
               >
@@ -430,7 +460,7 @@ const AuthManager = () => {
       {/* Create Auth Modal */}
       <AnimatePresence>
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-white/10 bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -460,7 +490,7 @@ const AuthManager = () => {
                         <Security className="mr-3 w-6 h-6" />
                         User Schema
                       </h3>
-                      
+
                       <div className="space-y-6">
                         <div>
                           <label className="block text-sm font-bold text-black mb-3">
@@ -487,7 +517,7 @@ const AuthManager = () => {
                               + Add Field
                             </button>
                           </div>
-                          
+
                           <div className="space-y-4">
                             {userFields.map((field, index) => (
                               <div key={index} className="bg-white p-4 rounded-xl border-2 border-gray-200">
@@ -524,7 +554,10 @@ const AuthManager = () => {
                                         type="checkbox"
                                         checked={field.required}
                                         onChange={(e) => updateUserField(index, { required: e.target.checked })}
-                                        className="w-4 h-4 rounded border-2 border-gray-300 text-black focus:ring-gray-400"
+                                        className="w-4 h-4 rounded border-2 border-gray-300 text-black focus:ring-gray-400 accent-black"
+                                        style={{
+                                          accentColor: field.required ? 'black' : undefined,
+                                        }}
                                       />
                                       <span className="text-sm font-medium text-black">Required</span>
                                     </label>
@@ -551,12 +584,12 @@ const AuthManager = () => {
                         <Key className="mr-3 w-6 h-6" />
                         Authentication Configuration
                       </h3>
-                      
+
                       <div className="space-y-6">
                         {/* Field Mapping */}
                         <div className="bg-white p-6 rounded-xl border-2 border-gray-200">
                           <h4 className="text-lg font-bold text-black mb-4">Field Mapping</h4>
-                          
+
                           <div className="space-y-4">
                             <div>
                               <label className="block text-sm font-bold text-black mb-3">
@@ -620,7 +653,7 @@ const AuthManager = () => {
                         <div className="bg-white p-6 rounded-xl border-2 border-gray-200">
                           <h4 className="text-lg font-bold text-black mb-4">Response Fields</h4>
                           <p className="text-sm text-gray-600 mb-4">Select which fields to include in authentication responses</p>
-                          
+
                           <div className="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto">
                             {allFieldNames.map(fieldName => {
                               if (fieldName === authConfig.password_field) return null // Never include password
@@ -636,7 +669,7 @@ const AuthManager = () => {
                                         : authConfig.response_fields.filter(f => f !== fieldName)
                                       setAuthConfig({ ...authConfig, response_fields: newFields })
                                     }}
-                                    className="w-4 h-4 rounded border-2 border-gray-300 text-black focus:ring-gray-400"
+                                    className="w-4 h-4 rounded border-2 border-gray-300 text-black focus:ring-gray-400 accent-black"
                                   />
                                   <span className="text-sm font-medium text-black">{fieldName}</span>
                                 </label>
@@ -648,7 +681,7 @@ const AuthManager = () => {
                         {/* Settings */}
                         <div className="bg-white p-6 rounded-xl border-2 border-gray-200">
                           <h4 className="text-lg font-bold text-black mb-4">Settings</h4>
-                          
+
                           <div className="space-y-4">
                             <div>
                               <label className="block text-sm font-bold text-black mb-3">
@@ -665,16 +698,6 @@ const AuthManager = () => {
                             </div>
 
                             <div className="space-y-4">
-                              <label className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border-2 border-gray-100 hover:border-gray-300 transition-all">
-                                <input
-                                  type="checkbox"
-                                  checked={authConfig.allow_signup}
-                                  onChange={(e) => setAuthConfig({ ...authConfig, allow_signup: e.target.checked })}
-                                  className="w-4 h-4 rounded border-2 border-gray-300 text-black focus:ring-gray-400"
-                                />
-                                <span className="text-sm font-medium text-black">Allow user registration</span>
-                              </label>
-
                               {authConfig.login_fields.username_field && (
                                 <label className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border-2 border-gray-100 hover:border-gray-300 transition-all">
                                   <input
@@ -684,7 +707,7 @@ const AuthManager = () => {
                                       ...authConfig,
                                       login_fields: { ...authConfig.login_fields, allow_both: e.target.checked }
                                     })}
-                                    className="w-4 h-4 rounded border-2 border-gray-300 text-black focus:ring-gray-400"
+                                    className="w-4 h-4 rounded border-2 border-gray-300 text-black focus:ring-gray-400 accent-black"
                                   />
                                   <span className="text-sm font-medium text-black">Allow login with email or username</span>
                                 </label>
@@ -723,7 +746,7 @@ const AuthManager = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-4 p-8 border-t-2 border-gray-100 bg-gray-50">
+              <div className="flex justify-end space-x-4 p-3 border-t-2 border-gray-100 bg-gray-50">
                 <button
                   onClick={() => setShowCreateModal(false)}
                   disabled={creating}
@@ -744,6 +767,27 @@ const AuthManager = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Confirmation Popup */}
+      <ConfirmationPopup
+        isVisible={showConfirmation}
+        title="Delete Authentication System"
+        message="Are you sure you want to delete this authentication system? This action cannot be undone and will permanently remove all associated user data and authentication endpoints."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteAuthSchema}
+        onCancel={cancelDeleteAuthSchema}
+        variant="danger"
+      />
+
+      {/* Notification Popup */}
+      <NotificationPopup
+        isVisible={showNotification}
+        type={notificationConfig.type}
+        title={notificationConfig.title}
+        message={notificationConfig.message}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   )
 }

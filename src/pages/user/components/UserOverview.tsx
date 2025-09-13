@@ -298,9 +298,6 @@ const UserOverview = ({setActiveTab}:any) => {
               </div>
             )}
           </div>
-          <button className="w-full mt-4 p-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-            View All Endpoints
-          </button>
         </motion.div>
       </div>
     </div>

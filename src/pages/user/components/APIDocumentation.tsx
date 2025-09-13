@@ -12,32 +12,7 @@ import {
 } from '@mui/icons-material'
 import { UserService } from '../../../services/userService'
 import { AuthService } from '../../../services/authService'
-
-interface APIDoc {
-  info: {
-    title: string
-    description: string
-    version: string
-    contact: {
-      name: string
-      email: string
-    }
-  }
-  host: string
-  basePath: string
-  schemes: string[]
-  api_key: string
-  paths: Record<string, any>
-  schemas: any[]
-}
-
-interface EndpointMethod {
-  summary: string
-  description: string
-  tags: string[]
-  parameters?: any[]
-  responses: Record<string, any>
-}
+import type { APIDoc, EndpointMethod } from './types'
 
 const APIDocumentation = () => {
   const [apiDoc, setApiDoc] = useState<APIDoc | null>(null)
@@ -349,7 +324,7 @@ const APIDocumentation = () => {
               // Open user-specific Swagger UI
               const baseUrl = process.env.NODE_ENV === 'production' 
                 ? 'https://www.schemacraft.it.com' 
-                : 'https://www.schemacraft.it.com'
+                : 'http://localhost:8080'
               
               // Open the user-specific Swagger UI in a new tab
               window.open(`${baseUrl}/user/swagger-ui?token=${token}`, '_blank')

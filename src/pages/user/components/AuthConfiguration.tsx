@@ -7,13 +7,8 @@ import {
   Key,
   Settings
 } from '@mui/icons-material'
-import type { AuthConfig, SchemaField } from '../../../services/schemaService'
-
-interface AuthConfigurationProps {
-  authConfig: AuthConfig | null
-  onAuthConfigChange: (config: AuthConfig | null) => void
-  fields: SchemaField[]
-}
+import type { AuthConfig } from '../../../services/schemaService'
+import type { AuthConfigurationProps } from './types'
 
 const AuthConfiguration = ({ authConfig, onAuthConfigChange, fields }: AuthConfigurationProps) => {
   const [enabled, setEnabled] = useState(authConfig?.enabled || false)
