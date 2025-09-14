@@ -45,9 +45,28 @@ export class DataService {
     return apiInstance;
   }
 
+  // Process relation fields to ensure proper format
+  static processRelationFields(data: Record<string, any>): Record<string, any> {
+    const processedData = { ...data };
+    
+    // Convert relation field values to ObjectID format if they're strings
+    for (const [key, value] of Object.entries(processedData)) {
+      if (typeof value === 'string' && value.match(/^[0-9a-fA-F]{24}$/)) {
+        // If it looks like an ObjectID, keep it as string (backend will handle conversion)
+        processedData[key] = value;
+      }
+    }
+    
+    return processedData;
+  }
+
   static async createDocument(collection: string, data: Record<string, any>): Promise<DataRecord> {
     const apiInstance = this.getAPIInstance();
-    const response = await apiInstance.post<DataRecord>(`/api/${collection}`, data);
+    
+    // Convert relation field values to proper format if needed
+    const processedData = this.processRelationFields(data);
+    
+    const response = await apiInstance.post<DataRecord>(`/api/${collection}`, processedData);
     return response.data;
   }
 
@@ -75,7 +94,11 @@ export class DataService {
     data: Record<string, any>
   ): Promise<DataRecord> {
     const apiInstance = this.getAPIInstance();
-    const response = await apiInstance.put<DataRecord>(`/api/${collection}/${id}`, data);
+    
+    // Convert relation field values to proper format if needed
+    const processedData = this.processRelationFields(data);
+    
+    const response = await apiInstance.put<DataRecord>(`/api/${collection}/${id}`, processedData);
     return response.data;
   }
 
@@ -83,5 +106,19 @@ export class DataService {
     const apiInstance = this.getAPIInstance();
     const response = await apiInstance.delete<{ message: string }>(`/api/${collection}/${id}`);
     return response.data;
+  }
+
+  // Get documents for relation field dropdowns
+  static async getDocumentsForRelation(collection: string): Promise<{ id: string; label: string }[]> {
+    try {
+      const response = await this.getDocuments(collection, 1, 100); // Get first 100 for dropdown
+      return response.data.map(doc => ({
+        id: doc.id,
+        label: doc.data.name || doc.data.title || doc.data.email || doc.id // Try common display fields
+      }));
+    } catch (error) {
+      console.error(`Failed to fetch documents for relation from ${collection}:`, error);
+      return [];
+    }
   }
 }

@@ -39,6 +39,19 @@ export class AuthService {
     });
   }
 
+  static async setPassword(password: string): Promise<void> {
+    await api.post('/auth/set-password', {
+      password: password,
+    });
+  }
+
+  static async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await api.post('/auth/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword,
+    });
+  }
+
   static signout(): void {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');

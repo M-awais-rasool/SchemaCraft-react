@@ -13,7 +13,7 @@ export interface NotificationConfig {
   message: string;
 }
 
-export type FieldType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'date';
+export type FieldType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'date' | 'relation';
 
 export interface APIDoc {
   info: {

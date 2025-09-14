@@ -11,6 +11,7 @@ export interface User {
   created_at: string;
   updated_at: string;
   last_login?: string;
+  has_password: boolean; // Whether user has a password set
   api_usage: {
     total_requests: number;
     last_request?: string;

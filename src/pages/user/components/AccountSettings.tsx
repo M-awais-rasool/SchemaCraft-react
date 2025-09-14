@@ -6,17 +6,19 @@ import {
   Notifications,
   Language,
   Delete,
-  // Save,
-  // Visibility,
-  // VisibilityOff,
+  Save,
+  Visibility,
+  VisibilityOff,
   Warning
 } from '@mui/icons-material'
 import { useAuth } from '../../../contexts/AuthContext'
+import { AuthService } from '../../../services/authService'
  
 const AccountSettings = () => {
-  const { user } = useAuth()
+  const { user, updateUser } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
-  // const [showPassword, setShowPassword] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -27,11 +29,14 @@ const AccountSettings = () => {
     email: '',
   })
   
-  // const [passwordData, setPasswordData] = useState({
-  //   currentPassword: '',
-  //   newPassword: '',
-  //   confirmPassword: ''
-  // })
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+  console.log('User data in AccountSettings:', user)
+  // Determine if user needs to set password (Google users without password)
+  const needsPasswordSetup = user?.google_id && !user?.has_password
   
   // const [notifications, setNotifications] = useState({
   //   emailUpdates: true,
@@ -60,10 +65,10 @@ const AccountSettings = () => {
     setTimeout(clearMessages, 5000)
   }
 
-  // const showSuccess = (message: string) => {
-  //   setSuccessMessage(message)
-  //   setTimeout(clearMessages, 3000)
-  // }
+  const showSuccess = (message: string) => {
+    setSuccessMessage(message)
+    setTimeout(clearMessages, 3000)
+  }
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: Person },
@@ -71,6 +76,43 @@ const AccountSettings = () => {
     { id: 'notifications', label: 'Notifications', icon: Notifications },
     { id: 'preferences', label: 'Preferences', icon: Language }
   ]
+
+  const handlePasswordChange = async () => {
+    clearMessages()
+    
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      showError('New passwords do not match!')
+      return
+    }
+    
+    if (passwordData.newPassword.length < 6) {
+      showError('New password must be at least 6 characters long')
+      return
+    }
+    
+    setLoading(true)
+    
+    try {
+      if (needsPasswordSetup) {
+        // For Google users setting their first password
+        await AuthService.setPassword(passwordData.newPassword)
+        showSuccess('Password set successfully! You can now log in with email and password.')
+      } else {
+        // For users changing their existing password
+        await AuthService.changePassword(passwordData.currentPassword, passwordData.newPassword)
+        showSuccess('Password updated successfully!')
+      }
+      
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+      
+      // Refresh user data to update has_password status
+      await updateUser()
+    } catch (error: any) {
+      showError(error.response?.data?.error || 'Failed to update password')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // const handleProfileSave = async () => {
   //   clearMessages()
@@ -214,40 +256,58 @@ const AccountSettings = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      {/* <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h3>
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          {needsPasswordSetup ? 'Set Password for Email Login' : 'Change Password'}
+        </h3>
+        {needsPasswordSetup && (
+          <p className="text-sm text-gray-600 mb-4">
+            Set a password to enable email login for your account. You can still use Google Sign-In anytime.
+          </p>
+        )}
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Current Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={passwordData.currentPassword}
-                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <VisibilityOff className="w-4 h-4" /> : <Visibility className="w-4 h-4" />}
-              </button>
+          {!needsPasswordSetup && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Current Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showCurrentPassword ? 'text' : 'password'}
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showCurrentPassword ? <VisibilityOff className="w-4 h-4" /> : <Visibility className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               New Password
             </label>
-            <input
-              type="password"
-              value={passwordData.newPassword}
-              onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            />
+            <div className="relative">
+              <input
+                type={showNewPassword ? 'text' : 'password'}
+                value={passwordData.newPassword}
+                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showNewPassword ? <VisibilityOff className="w-4 h-4" /> : <Visibility className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
           
           <div>
@@ -269,7 +329,12 @@ const AccountSettings = () => {
               className="flex items-center space-x-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="w-4 h-4" />
-              <span>{loading ? 'Updating...' : 'Update Password'}</span>
+              <span>
+                {loading 
+                  ? (needsPasswordSetup ? 'Setting...' : 'Updating...') 
+                  : (needsPasswordSetup ? 'Set Password' : 'Update Password')
+                }
+              </span>
             </button>
           </div>
         </div>
@@ -281,16 +346,16 @@ const AccountSettings = () => {
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Authenticator App</h4>
-              <p className="text-sm text-gray-600">Not configured</p>
+              <p className="text-sm text-gray-600">Coming soon</p>
             </div>
-            <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            <button 
+              disabled
+              className="px-4 py-2 border border-gray-300 text-gray-400 rounded-lg cursor-not-allowed"
+            >
               Setup
             </button>
           </div>
         </div>
-      </div> */}
-      <div className="flex items-center justify-center h-32">
-        <span className="text-gray-500 text-lg font-medium">This feature is coming soon.</span>
       </div>
     </motion.div>
   )

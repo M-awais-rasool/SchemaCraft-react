@@ -309,15 +309,16 @@ const AuthManager = () => {
 
       {/* MongoDB Connection Warning */}
       {!hasMongoConnection && (
-        <motion.div
+         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6"
+          className="bg-yellow-50 border border-yellow-200 rounded-xl p-4"
         >
-          <div className="flex items-center space-x-3">
-            <Warning className="w-5 h-5 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">
-              Please configure your MongoDB connection first before creating authentication systems.
+          <div className="flex items-center space-x-2">
+            <Warning className="w-4 h-4 text-yellow-600" />
+            <span className="text-sm text-yellow-600">
+              Please configure your MongoDB connection first before creating tables.
+              Go to the MongoDB Connection tab to set up your database.
             </span>
           </div>
         </motion.div>

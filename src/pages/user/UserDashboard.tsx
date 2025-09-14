@@ -5,7 +5,7 @@ import {
   Key,
   Storage,
   TableChart,
-  Visibility,
+  // Visibility,
   Settings,
   Menu,
   Close,
@@ -21,7 +21,7 @@ import UserOverview from './components/UserOverview'
 import APIKeyManager from './components/APIKeyManager'
 import MongoConnection from './components/MongoConnection'
 import TablesManager from './components/TablesManager'
-import DataViewer from './components/DataViewer'
+// import DataViewer from './components/DataViewer'
 import AccountSettings from './components/AccountSettings'
 import APIDocumentation from './components/APIDocumentation'
 import AuthManager from './components/AuthManager'
@@ -44,7 +44,7 @@ const UserDashboard = () => {
     { id: 'mongodb', label: 'MongoDB Connection', icon: Storage },
     { id: 'tables', label: 'Tables', icon: TableChart },
     { id: 'auth', label: 'Authentication', icon: Security },
-    { id: 'data', label: 'Data Viewer', icon: Visibility },
+    // { id: 'data', label: 'Data Viewer', icon: Visibility },
     { id: 'api-docs', label: 'API Documentation', icon: Description },
     { id: 'notifications', label: 'Notifications', icon: Notifications },
     { id: 'settings', label: 'Account Settings', icon: Settings },
@@ -62,8 +62,8 @@ const UserDashboard = () => {
         return <TablesManager />
       case 'auth':
         return <AuthManager />
-      case 'data':
-        return <DataViewer />
+      // case 'data':
+      //   return <DataViewer />
       case 'api-docs':
         return <APIDocumentation />
       case 'notifications':

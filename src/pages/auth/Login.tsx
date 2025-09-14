@@ -27,8 +27,9 @@ export default function LoginScreen() {
     const [isSignUp, setIsSignUp] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [showPasswordSetup, setShowPasswordSetup] = useState(false);
     const navigate = useNavigate();
-    const { login, signup, googleAuth, isAuthenticated, user, isLoading: authLoading } = useAuth();
+    const { login, signup, googleAuth, isAuthenticated, user, isLoading: authLoading, setPassword, updateUser } = useAuth();
 
     useEffect(() => { setMounted(true); }, []);
 
@@ -106,8 +107,51 @@ export default function LoginScreen() {
             }
         } catch (error: any) {
             console.error('Authentication error:', error);
+            
+            // Check if this is a Google account that needs password setup
+            if (error.response?.data?.needs_password_setup && !isSignUp) {
+                setShowPasswordSetup(true);
+                setErrors({
+                    general: error.response?.data?.error || 'This email is linked to a Google account.',
+                });
+            } else {
+                setErrors({
+                    general: error.response?.data?.error || 'Authentication failed. Please try again.',
+                });
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handlePasswordSetup = async () => {
+        if (!formData.password || formData.password.length < 6) {
             setErrors({
-                general: error.response?.data?.error || 'Authentication failed. Please try again.',
+                password: 'Password must be at least 6 characters',
+            });
+            return;
+        }
+
+        setIsLoading(true);
+        setErrors({});
+
+        try {
+            // First authenticate with Google to get a session
+            await googleAuth();
+            
+            // Then set the password
+            await setPassword(formData.password);
+            
+            // Update user data to reflect password has been set
+            await updateUser();
+            
+            setSuccessMessage('Password set successfully! You can now log in with email and password.');
+            setShowPasswordSetup(false);
+            setFormData({ name: '', email: formData.email, password: '' });
+        } catch (error: any) {
+            console.error('Password setup error:', error);
+            setErrors({
+                general: error.response?.data?.error || 'Failed to set password. Please try again.',
             });
         } finally {
             setIsLoading(false);
@@ -306,6 +350,33 @@ export default function LoginScreen() {
                         {successMessage && (
                             <div className="text-green-500 text-sm text-center bg-green-50 p-3 rounded-lg">
                                 {successMessage}
+                            </div>
+                        )}
+
+                        {/* Password Setup for Google Users */}
+                        {showPasswordSetup && !isSignUp && (
+                            <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                                <h3 className="text-blue-800 font-medium mb-2">Set up Email Login</h3>
+                                <p className="text-blue-700 text-sm mb-3">
+                                    To use email login, please set a password for your account. You can still sign in with Google anytime.
+                                </p>
+                                <div className="flex space-x-2">
+                                    <button
+                                        type="button"
+                                        onClick={handlePasswordSetup}
+                                        disabled={isLoading || !formData.password}
+                                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {isLoading ? 'Setting...' : 'Set Password'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPasswordSetup(false)}
+                                        className="px-4 py-2 text-blue-600 hover:text-blue-800"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             </div>
                         )}
 

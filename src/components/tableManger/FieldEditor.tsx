@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion'
 import { Add, Delete } from '@mui/icons-material'
-import { type SchemaField } from '../../services/schemaService'
+import { type SchemaField, SchemaService } from '../../services/schemaService'
 import { type FieldType } from '../../pages/user/components/types'
+import { useEffect, useState } from 'react'
 
 interface FieldEditorProps {
   fields: SchemaField[];
@@ -10,7 +11,24 @@ interface FieldEditorProps {
 }
 
 const FieldEditor = ({ fields, onFieldsChange, className = '' }: FieldEditorProps) => {
-  const fieldTypes: FieldType[] = ['string', 'number', 'boolean', 'array', 'object', 'date']
+  const fieldTypes: FieldType[] = ['string', 'number', 'boolean', 'array', 'object', 'date', 'relation']
+  const [availableCollections, setAvailableCollections] = useState<{id: string, collection_name: string}[]>([])
+
+  useEffect(() => {
+    fetchAvailableCollections()
+  }, [])
+
+  const fetchAvailableCollections = async () => {
+    try {
+      const schemas = await SchemaService.getSchemas()
+      setAvailableCollections(schemas.map(schema => ({
+        id: schema.id,
+        collection_name: schema.collection_name
+      })))
+    } catch (error) {
+      console.error('Failed to fetch collections:', error)
+    }
+  }
 
   const addField = () => {
     const newFields = [...fields, { name: '', type: 'string', visibility: 'public', required: false }]
@@ -77,7 +95,7 @@ const FieldEditor = ({ fields, onFieldsChange, className = '' }: FieldEditorProp
                 </label>
                 <select
                   value={field.type}
-                  onChange={(e) => updateField(index, { type: e.target.value })}
+                  onChange={(e) => updateField(index, { type: e.target.value, target: e.target.value === 'relation' ? '' : field.target })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-200 text-sm bg-white"
                 >
                   {fieldTypes.map(type => (
@@ -86,19 +104,41 @@ const FieldEditor = ({ fields, onFieldsChange, className = '' }: FieldEditorProp
                 </select>
               </div>
 
-              <div className="lg:col-span-1">
-                <label className="block text-xs font-semibold text-gray-700 mb-2">
-                  Visibility
-                </label>
-                <select
-                  value={field.visibility}
-                  onChange={(e) => updateField(index, { visibility: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-200 text-sm bg-white"
-                >
-                  <option value="public">Public</option>
-                  <option value="private">Private</option>
-                </select>
-              </div>
+              {field.type === 'relation' && (
+                <div className="lg:col-span-1">
+                  <label className="block text-xs font-semibold text-gray-700 mb-2">
+                    Target Collection
+                  </label>
+                  <select
+                    value={field.target || ''}
+                    onChange={(e) => updateField(index, { target: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-200 text-sm bg-white"
+                  >
+                    <option value="">Select a collection</option>
+                    {availableCollections.map(collection => (
+                      <option key={collection.id} value={collection.collection_name}>
+                        {collection.collection_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {field.type !== 'relation' && (
+                <div className="lg:col-span-1">
+                  <label className="block text-xs font-semibold text-gray-700 mb-2">
+                    Visibility
+                  </label>
+                  <select
+                    value={field.visibility}
+                    onChange={(e) => updateField(index, { visibility: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black/20 focus:border-black transition-all duration-200 text-sm bg-white"
+                  >
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                  </select>
+                </div>
+              )}
 
               <div className="lg:col-span-1 flex items-center justify-between">
                 <div className="flex items-center space-x-4">

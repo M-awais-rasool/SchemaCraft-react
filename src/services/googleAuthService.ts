@@ -12,9 +12,9 @@ export class GoogleAuthService {
       if (!firebaseUser.email) {
         throw new Error('No email found in Google account');
       }
-
+      console.log('Google user authenticated:', firebaseUser);
       const idToken = await firebaseUser.getIdToken();
-      
+      console.log('Google ID Token:', idToken);
       const response = await api.post<LoginResponse>('/auth/google', {
         id_token: idToken,
       });

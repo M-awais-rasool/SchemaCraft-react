@@ -7,6 +7,7 @@ export interface SchemaField {
   required: boolean;
   default?: any;
   description?: string;
+  target?: string; // For relation fields, specifies target collection
 }
 
 export interface AuthFieldConfig {

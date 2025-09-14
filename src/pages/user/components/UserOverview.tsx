@@ -239,7 +239,7 @@ const UserOverview = ({setActiveTab}:any) => {
           <div className="space-y-3">
             {activitiesLoading ? (
               // Loading skeleton for activities
-              Array.from({ length: 3 }).map((_, index) => (
+              Array?.from({ length: 3 }).map((_, index) => (
                 <div key={index} className="flex items-center space-x-3 p-3 rounded-lg animate-pulse">
                   <div className="w-2 h-2 rounded-full bg-gray-300" />
                   <div className="flex-1">
@@ -248,7 +248,7 @@ const UserOverview = ({setActiveTab}:any) => {
                   </div>
                 </div>
               ))
-            ) : recentActivities.length > 0 ? (
+            ) : recentActivities?.length > 0 ? (
               recentActivities.map((activity, index) => (
                 <div key={activity.id || index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50">
                   <div className={`w-2 h-2 rounded-full ${ActivityService.getActivityColor(activity.type).replace('text-', 'bg-')}`} />
@@ -278,8 +278,8 @@ const UserOverview = ({setActiveTab}:any) => {
             <Api className="w-5 h-5 text-gray-400" />
           </div>
           <div className="space-y-3">
-            {dashboardData?.schemas && dashboardData.schemas.length > 0 ? (
-              dashboardData.schemas.slice(0, 3).map((schema: any) => (
+            {dashboardData?.schemas && dashboardData.schemas?.length > 0 ? (
+              dashboardData?.schemas.slice(0, 3).map((schema: any) => (
                 <div key={schema.id} className="p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-mono text-gray-900">

@@ -13,6 +13,7 @@ interface AuthContextType {
   googleAuth: () => Promise<void>;
   logout: () => void;
   updateUser: () => Promise<void>;
+  setPassword: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -105,6 +106,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const setPassword = async (password: string) => {
+    try {
+      await AuthService.setPassword(password);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
@@ -114,6 +123,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     googleAuth,
     logout,
     updateUser,
+    setPassword,
   };
 
   return (
