@@ -49,11 +49,22 @@ const APIDocumentationModal = ({
     const handleCopyDocumentation = () => {
         if (!schema) return
 
+        let authEndpoints = ''
+        if (schema.auth_config?.enabled) {
+            authEndpoints = `
+Authentication Endpoints:
+- POST /api/${schema.collection_name}/auth/login
+${schema.auth_config?.allow_signup ? `- POST /api/${schema.collection_name}/auth/signup` : ''}
+- GET /api/${schema.collection_name}/auth/validate
+
+`
+        }
+
         const docText = `API Documentation for ${schema.collection_name}
 
 Base URL: https://your-api-domain.com/api/${schema.collection_name}
-
-Endpoints:
+${authEndpoints}
+Data Management Endpoints:
 - GET /api/${schema.collection_name}
 - POST /api/${schema.collection_name}
 - PUT /api/${schema.collection_name}/:id
@@ -118,6 +129,92 @@ Endpoints:
                                     </svg>
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900">Available Endpoints</h3>
+                            </div>
+
+                            {/* Authentication Endpoints - Show if auth is enabled */}
+                            {schema.auth_config?.enabled && (
+                                <div className="space-y-4">
+                                    <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-200">
+                                        <div className="flex items-center space-x-3 mb-4">
+                                            <span className="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-bold">AUTH</span>
+                                            <h4 className="text-lg font-semibold text-gray-900">Authentication Endpoints</h4>
+                                            <span className="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full flex items-center space-x-1">
+                                                🔓 <span>Public</span>
+                                            </span>
+                                        </div>
+                                        <div className="space-y-4">
+                                            {/* Login Endpoint */}
+                                            <div>
+                                                <h5 className="font-semibold text-gray-700 mb-2">Login Endpoint</h5>
+                                                <div className="bg-gray-900 rounded-lg p-4">
+                                                    <code className="text-green-400 font-mono">POST /api/{schema.collection_name}/auth/login</code>
+                                                </div>
+                                            </div>
+
+                                            {/* Signup Endpoint - Show only if signup is allowed */}
+                                            {schema.auth_config?.allow_signup && (
+                                                <div>
+                                                    <h5 className="font-semibold text-gray-700 mb-2">Signup Endpoint</h5>
+                                                    <div className="bg-gray-900 rounded-lg p-4">
+                                                        <code className="text-green-400 font-mono">POST /api/{schema.collection_name}/auth/signup</code>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Validate Token Endpoint */}
+                                            <div>
+                                                <h5 className="font-semibold text-gray-700 mb-2">Validate Token Endpoint</h5>
+                                                <div className="bg-gray-900 rounded-lg p-4">
+                                                    <code className="text-green-400 font-mono">GET /api/{schema.collection_name}/auth/validate</code>
+                                                </div>
+                                            </div>
+
+                                            {/* JavaScript Example for Login */}
+                                            <div>
+                                                <h5 className="font-semibold text-gray-700 mb-2">Login Example</h5>
+                                                <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                                                    <pre className="text-green-400 font-mono text-sm">
+                                                        {`const response = await fetch('/api/${schema.collection_name}/auth/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    "${schema.auth_config?.login_fields?.email_field || 'email'}": "user@example.com",
+    "${schema.auth_config?.password_field || 'password'}": "your_password"
+  })
+});
+const data = await response.json();
+// data.token contains your JWT token`}
+                                                    </pre>
+                                                </div>
+                                            </div>
+
+                                            {/* Authentication Configuration Details */}
+                                            <div className="bg-purple-100 rounded-lg p-4">
+                                                <h6 className="font-semibold text-purple-800 mb-2">Authentication Configuration</h6>
+                                                <div className="text-sm text-purple-700 space-y-1">
+                                                    <div>• Login Field: <code className="bg-purple-200 px-1 rounded">{schema.auth_config?.login_fields?.email_field || 'email'}</code></div>
+                                                    <div>• Token Expiration: {schema.auth_config?.token_expiration || 24} hours</div>
+                                                    <div>• Signup Allowed: {schema.auth_config?.allow_signup ? 'Yes' : 'No'}</div>
+                                                    {schema.auth_config?.login_fields?.username_field && (
+                                                        <div>• Username Field: <code className="bg-purple-200 px-1 rounded">{schema.auth_config.login_fields.username_field}</code></div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* CRUD Endpoints Section Header */}
+                            <div className="flex items-center space-x-3 pt-4">
+                                <div className="p-2 bg-gray-600 rounded-lg">
+                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 1.79 4 4 4h8c2.21 0 4-1.79 4-4V7M4 7l8-4 8 4M4 7l8 4 8-4" />
+                                    </svg>
+                                </div>
+                                <h4 className="text-lg font-bold text-gray-900">Data Management Endpoints</h4>
                             </div>
 
                             {/* GET Endpoint */}

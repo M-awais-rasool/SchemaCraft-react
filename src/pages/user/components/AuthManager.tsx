@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Security,
-  Edit,
   Delete,
   Visibility,
   Close,
@@ -15,10 +14,13 @@ import { SchemaService, type Schema, type SchemaField, type AuthConfig } from '.
 import { useAuth } from '../../../contexts/AuthContext'
 import NotificationPopup from '../../../components/NotificationPopup'
 import ConfirmationPopup from '../../../components/ConfirmationPopup'
+import APIDocumentationModal from '../../../components/tableManger/APIDocumentationModal'
 
 const AuthManager = () => {
   const { user } = useAuth()
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showApiDocModal, setShowApiDocModal] = useState(false)
+  const [selectedSchema, setSelectedSchema] = useState<Schema | null>(null)
   const [authSchemas, setAuthSchemas] = useState<Schema[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
@@ -258,6 +260,11 @@ const AuthManager = () => {
     setPendingDeleteId(null)
   }
 
+  const handleShowApiDoc = (schema: Schema) => {
+    setSelectedSchema(schema)
+    setShowApiDocModal(true)
+  }
+
   const stringFields = userFields.filter(field => field.type === 'string')
   const allFieldNames = userFields.map(field => field.name).filter(name => name)
 
@@ -427,11 +434,12 @@ const AuthManager = () => {
 
             <div className="flex justify-between items-center pt-6 border-t-2 border-gray-100">
               <div className="flex space-x-3">
-                <button className="p-2 text-gray-400 hover:text-black transition-colors rounded-lg hover:bg-gray-100">
+                <button 
+                  onClick={() => handleShowApiDoc(schema)}
+                  className="p-2 text-gray-400 hover:text-black transition-colors rounded-lg hover:bg-gray-100"
+                  title="View API Documentation"
+                >
                   <Visibility className="w-5 h-5" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-black transition-colors rounded-lg hover:bg-gray-100">
-                  <Edit className="w-5 h-5" />
                 </button>
               </div>
               <button
@@ -448,8 +456,13 @@ const AuthManager = () => {
             <h3 className="text-xl font-bold text-black mb-3">No Authentication Systems</h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">Create your first authentication system to secure your APIs with user login and registration functionality</p>
             <button
+              disabled={!hasMongoConnection}
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center space-x-3 px-8 py-4 bg-black text-white rounded-xl hover:bg-gray-800 transition-all mx-auto shadow-lg hover:shadow-xl"
+            className={`flex items-center space-x-3 px-8 py-4 rounded-xl transition-all mx-auto shadow-lg hover:shadow-xl ${
+              hasMongoConnection
+                ? 'bg-black text-white hover:bg-gray-800'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
             >
               <Security className="w-5 h-5" />
               <span className="font-semibold">Create Auth System</span>
@@ -788,6 +801,19 @@ const AuthManager = () => {
         title={notificationConfig.title}
         message={notificationConfig.message}
         onClose={() => setShowNotification(false)}
+      />
+
+      {/* API Documentation Modal */}
+      <APIDocumentationModal
+        isVisible={showApiDocModal}
+        schema={selectedSchema}
+        onClose={() => {
+          setShowApiDocModal(false)
+          setSelectedSchema(null)
+        }}
+        onCopyDocumentation={(message: string) => {
+          showNotificationPopup('success', 'Copied!', message)
+        }}
       />
     </div>
   )
