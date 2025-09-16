@@ -223,7 +223,8 @@ const APIDocumentation = () => {
           <div>
             <h3 className="font-medium text-gray-900 mb-2">Version</h3>
             <div className="bg-gray-50 rounded-lg p-3 font-mono text-sm">
-              {apiDoc.info.version}
+              {/* {apiDoc.info.version} */}
+              1.0
             </div>
           </div>
         </div>

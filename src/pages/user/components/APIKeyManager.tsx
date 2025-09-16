@@ -134,10 +134,6 @@ const APIKeyManager = () => {
             <Refresh className={`w-4 h-4 ${isRegenerating ? 'animate-spin' : ''}`} />
             <span>{isRegenerating ? 'Regenerating...' : 'Regenerate API Key'}</span>
           </button>
-          <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-            <Security className="w-4 h-4" />
-            <span>View Usage</span>
-          </button>
         </div>
 
         {/* Error Message */}
