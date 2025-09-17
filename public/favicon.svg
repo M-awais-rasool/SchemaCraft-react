@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Simplified database icon for favicon -->
+  <ellipse cx="8" cy="12" rx="6" ry="2" fill="url(#grad1)"/>
+  <ellipse cx="8" cy="8" rx="6" ry="2" fill="url(#grad1)"/>
+  <rect x="2" y="8" width="12" height="4" fill="url(#grad1)" opacity="0.8"/>
+  
+  <!-- Simple schema lines -->
+  <line x1="4" y1="9" x2="12" y2="9" stroke="white" stroke-width="0.5"/>
+  <line x1="4" y1="11" x2="10" y2="11" stroke="white" stroke-width="0.5"/>
+  
+  <!-- Craft symbol -->
+  <path d="M8 2 L10 4 L8 5 L6 4 Z" fill="#fbbf24"/>
+  <line x1="8" y1="5" x2="8" y2="8" stroke="#f59e0b" stroke-width="1"/>
+</svg>
