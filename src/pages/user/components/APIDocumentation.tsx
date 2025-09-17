@@ -325,7 +325,7 @@ const APIDocumentation = () => {
               // Open user-specific Swagger UI
               const baseUrl = process.env.NODE_ENV === 'production' 
                 ? 'https://www.schemacraft.it.com' 
-                : 'http://localhost:8080'
+                : 'https://www.schemacraft.it.com'
               
               // Open the user-specific Swagger UI in a new tab
               window.open(`${baseUrl}/user/swagger-ui?token=${token}`, '_blank')

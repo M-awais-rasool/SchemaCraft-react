@@ -169,10 +169,19 @@ export default function LoginScreen() {
             // Navigation will be handled by the useEffect hook
         } catch (error: any) {
             console.error('Google Sign-In Error:', error);
-            const errorMessage = error.response?.data?.error || error.message || 'Google authentication failed. Please try again.';
-            setErrors({
-                general: errorMessage,
-            });
+            
+            // Check if the error is due to popup cancellation
+            if (error.code === 'auth/popup-cancelled' || 
+                error.message === 'Google sign-in was cancelled') {
+                // Don't show an error message for cancellation, just reset loading state
+                console.log('Google sign-in cancelled by user');
+            } else {
+                // Show error for actual authentication failures
+                const errorMessage = error.response?.data?.error || error.message || 'Google authentication failed. Please try again.';
+                setErrors({
+                    general: errorMessage,
+                });
+            }
         } finally {
             setIsLoading(false);
         }

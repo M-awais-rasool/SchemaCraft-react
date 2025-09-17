@@ -179,39 +179,6 @@ export function Hero() {
                 </Button>
               </motion.div>
             </motion.div>
-
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.6 }}
-              className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start text-center lg:text-left"
-            >
-              {[
-                { icon: Users, label: "10k+ Teams", delay: 0 },
-                { icon: Database, label: "1M+ Tables Created", delay: 0.1 },
-                { icon: Zap, label: "99.9% Uptime", delay: 0.2 }
-              ].map((stat) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1 + stat.delay, duration: 0.4 }}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  className="flex items-center gap-2 group cursor-pointer"
-                >
-                  <motion.div
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <stat.icon className="h-5 w-5 text-primary" />
-                  </motion.div>
-                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                    {stat.label}
-                  </span>
-                </motion.div>
-              ))}
-            </motion.div>
           </motion.div>
 
           {/* Animated Visual */}

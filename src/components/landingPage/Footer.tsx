@@ -1,10 +1,10 @@
 import { Separator } from "./ui/separator";
-import { Button } from "./ui/button";
+// import { Button } from "./ui/button";
 import { 
-  Github, 
-  Twitter, 
-  Linkedin, 
-  Youtube, 
+  // Github, 
+  // Twitter, 
+  // Linkedin, 
+  // Youtube, 
   Mail, 
   Database,
   Shield,
@@ -38,7 +38,7 @@ export function Footer() {
               The future of database schema management. Build, collaborate, and deploy 
               with confidence in real-time.
             </p>
-            <div className="flex space-x-3">
+            {/* <div className="flex space-x-3">
               <Button variant="ghost" size="sm" className="text-primary-foreground hover:text-primary hover:bg-primary-foreground">
                 <Github className="h-4 w-4" />
               </Button>
@@ -51,7 +51,7 @@ export function Footer() {
               <Button variant="ghost" size="sm" className="text-primary-foreground hover:text-primary hover:bg-primary-foreground">
                 <Youtube className="h-4 w-4" />
               </Button>
-            </div>
+            </div> */}
           </div>
 
           {/* Product */}

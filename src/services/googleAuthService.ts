@@ -25,8 +25,19 @@ export class GoogleAuthService {
       }
       
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google authentication error:', error);
+      
+      // Handle Firebase popup cancellation errors
+      if (error.code === 'auth/popup-closed-by-user' || 
+          error.code === 'auth/cancelled-popup-request' ||
+          error.code === 'auth/popup-blocked') {
+        // Create a specific error for popup cancellation
+        const cancelError = new Error('Google sign-in was cancelled');
+        (cancelError as any).code = 'auth/popup-cancelled';
+        throw cancelError;
+      }
+      
       throw error;
     }
   }

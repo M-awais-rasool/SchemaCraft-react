@@ -13,6 +13,7 @@ import {
 import { AuthService } from '../../../services/authService'
 import NotificationService from '../../../services/notificationService'
 import { useAuth } from '../../../contexts/AuthContext'
+import NotificationPopup from '../../../components/NotificationPopup'
 
 const MongoConnection = () => {
   const { user, updateUser } = useAuth()
@@ -23,7 +24,21 @@ const MongoConnection = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle')
   const [error, setError] = useState<string | null>(null)
+
+  // Notification popup state
+  const [showNotification, setShowNotification] = useState(false)
+  const [notificationConfig, setNotificationConfig] = useState({
+    type: 'success' as 'success' | 'error',
+    title: '',
+    message: ''
+  })
  
+  // Helper function to show notifications
+  const showNotificationPopup = (type: 'success' | 'error', title: string, message: string) => {
+    setNotificationConfig({ type, title, message })
+    setShowNotification(true)
+  }
+
   // Initialize form with existing user data
   useEffect(() => {
     if (user?.mongodb_uri) {
@@ -81,10 +96,11 @@ const MongoConnection = () => {
       // Update user context
       await updateUser()
       
-      alert('MongoDB connection saved successfully!')
+      showNotificationPopup('success', 'Connection Saved!', 'MongoDB connection has been saved successfully!')
     } catch (err: any) {
       console.error('Failed to save MongoDB connection:', err)
       setError('Failed to save MongoDB connection')
+      showNotificationPopup('error', 'Save Failed', 'Failed to save MongoDB connection. Please try again.')
     } finally {
       setIsSaving(false)
     }
@@ -355,6 +371,15 @@ const MongoConnection = () => {
           and <code className="bg-gray-100 px-1 rounded">mydatabase</code> with your actual credentials.
         </p>
       </motion.div>
+
+      {/* Notification Popup */}
+      <NotificationPopup
+        isVisible={showNotification}
+        type={notificationConfig.type}
+        title={notificationConfig.title}
+        message={notificationConfig.message}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   )
 }

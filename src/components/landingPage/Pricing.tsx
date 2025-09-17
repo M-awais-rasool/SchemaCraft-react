@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const pricingPlans = [
   {
@@ -21,7 +22,8 @@ const pricingPlans = [
     badge: null,
     popular: false,
     buttonText: "Get Started Free",
-    buttonVariant: "outline" as const
+    buttonVariant: "outline" as const,
+    isComingSoon: false
   },
   {
     name: "Premium",
@@ -38,14 +40,22 @@ const pricingPlans = [
       "API documentation generator",
       "Custom integrations"
     ],
-    badge: "Most Popular",
+    badge: "Coming Soon",
     popular: true,
-    buttonText: "Start Premium Trial",
-    buttonVariant: "default" as const
+    buttonText: "Coming Soon",
+    buttonVariant: "outline" as const,
+    isComingSoon: true
   }
 ];
 
 export function Pricing() {
+  const navigate = useNavigate();
+
+  const handleButtonClick = (plan: typeof pricingPlans[0]) => {
+    if (plan.name === "Free" && !plan.isComingSoon) {
+      navigate('/login');
+    }
+  };
   return (
     <section id="pricing" className="py-16 lg:py-24 bg-gradient-to-br from-background via-muted/20 to-background relative overflow-hidden">
       {/* Background decoration */}
@@ -104,10 +114,14 @@ export function Pricing() {
                 plan.popular 
                   ? 'border-primary shadow-lg hover:shadow-xl scale-105' 
                   : 'border-border hover:shadow-lg hover:border-primary/50'
-              }`}>
+              } ${plan.isComingSoon ? 'opacity-75' : ''}`}>
                 {plan.badge && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-primary text-primary-foreground px-4 py-1">
+                    <Badge className={`px-4 py-1 ${
+                      plan.isComingSoon 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-primary text-primary-foreground'
+                    }`}>
                       <Zap className="h-3 w-3 mr-1" />
                       {plan.badge}
                     </Badge>
@@ -121,10 +135,18 @@ export function Pricing() {
                     <p className="text-muted-foreground mb-4">{plan.description}</p>
                     
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl md:text-5xl font-bold">
-                        ${plan.price}
-                      </span>
-                      <span className="text-muted-foreground">/{plan.period}</span>
+                      {plan.isComingSoon ? (
+                        <span className="text-3xl md:text-4xl font-bold">
+                          Coming Soon
+                        </span>
+                      ) : (
+                        <>
+                          <span className="text-4xl md:text-5xl font-bold">
+                            ${plan.price}
+                          </span>
+                          <span className="text-muted-foreground">/{plan.period}</span>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -153,13 +175,15 @@ export function Pricing() {
 
                   {/* CTA Button */}
                   <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={!plan.isComingSoon ? { scale: 1.02 } : {}}
+                    whileTap={!plan.isComingSoon ? { scale: 0.98 } : {}}
                   >
                     <Button 
                       variant={plan.buttonVariant}
                       size="lg" 
                       className="w-full"
+                      disabled={plan.isComingSoon}
+                      onClick={() => handleButtonClick(plan)}
                     >
                       {plan.buttonText}
                     </Button>
@@ -173,7 +197,7 @@ export function Pricing() {
 
                   {plan.name === "Premium" && (
                     <p className="text-xs text-muted-foreground text-center mt-4">
-                      Cancel anytime
+                      {plan.isComingSoon ? "Stay tuned for updates" : "Cancel anytime"}
                     </p>
                   )}
                 </CardContent>
